@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "871327187127",
+    "firebase_url": "https://sporthallbooking.firebaseio.com",
+    "project_id": "sporthallbooking",
+    "storage_bucket": "sporthallbooking.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:871327187127:android:b186dd28670fe346",
+        "android_client_info": {
+          "package_name": "ch.he_arc.ig.techno.group4.sporthallbooking"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "871327187127-n8coraeeqhuuqrcm7q9rt1sjk284r5lo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ch.he_arc.ig.techno.group4.sporthallbooking",
+            "certificate_hash": "111d572464178b94a2f0d25718dff1239ec383a3"
+          }
+        },
+        {
+          "client_id": "871327187127-mn7fga4o1ek108bm9r6lnr1l3h05bnja.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyACmYE7FtR1HNiOcbf_xg2Ey3BJ8DC113E"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "871327187127-mn7fga4o1ek108bm9r6lnr1l3h05bnja.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

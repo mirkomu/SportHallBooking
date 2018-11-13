@@ -1,6 +1,7 @@
 package ch.he_arc.ig.techno.group4.sporthallbooking;
 
 import android.graphics.Color;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -143,12 +145,26 @@ public class MainActivity extends AppCompatActivity {
             }
         };
         db.addValueEventListener(dataListener);
+
+        agenda.setOnDateChangedListener(new OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+                for (Map.Entry<CalendarDay, String> dateBooked : bookedDays.entrySet()) {
+                    //int MonthCorrected = (dateBooked.getKey().getMonth() + 1);
+                    //String strDateBooked = dateBooked.getKey().getDay() + "-" + MonthCorrected + "-" + dateBooked.getKey().getYear();
+                    if (date.getDate().compareTo(dateBooked.getKey().getDate()) == 0) {
+                        diplayToast(dateBooked.getValue() + " a déjà réservé le " + dateBooked.getKey().getDate().toString());
+                        break;
+                    }
+                }
+            }
+        });
     }
 
     // Affichage d'une notification rapide de type toast pour l'utilisateur :
     public void diplayToast(String message) {
         Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 50);
+        toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 225);
         toast.show();
     }
 }

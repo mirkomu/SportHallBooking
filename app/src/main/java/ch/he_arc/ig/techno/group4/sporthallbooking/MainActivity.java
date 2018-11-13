@@ -7,6 +7,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
 import java.util.Date;
@@ -26,8 +28,13 @@ public class MainActivity extends AppCompatActivity {
                 EditText nameEdit = (EditText)findViewById(R.id.editTextName);
                 String namePerson = nameEdit.getText().toString();
                 MaterialCalendarView cal = (MaterialCalendarView)findViewById(R.id.calendarView);
-                Toast.makeText(getApplicationContext(), "Réservation pour " + namePerson + " le " + cal.getSelectedDate().getDay() + "." + cal.getSelectedDate().getMonth() + "." +
-                        cal.getSelectedDate().getYear(), Toast.LENGTH_LONG).show();
+                String strChosenDate =  cal.getSelectedDate().getDay() + "." + cal.getSelectedDate().getMonth() + "." +
+                        cal.getSelectedDate().getYear();
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference myRef = database.getReference(namePerson);
+                myRef.setValue(strChosenDate);
+                Toast.makeText(getApplicationContext(), "Réservation pour " + namePerson + " le " + strChosenDate, Toast.LENGTH_LONG).show();
+
             }
         });
     }

@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                     String[] partsDate = sd.toString().split(Pattern.quote("-"));
                     // TODO : Gérer les exceptions :
                     day = Integer.parseInt(partsDate[0]);
-                    month = Integer.parseInt(partsDate[1]) + 1;
+                    month = Integer.parseInt(partsDate[1]) - 1;
                     year = Integer.parseInt(partsDate[2]);
                     InitialBookedDays.add(CalendarDay.from(year, month, day));
                     agenda.addDecorator(new EventDecorator(Color.RED, InitialBookedDays));
@@ -71,14 +71,15 @@ public class MainActivity extends AppCompatActivity {
                 EditText nameEdit = (EditText)findViewById(R.id.editTextName);
                 String namePerson = nameEdit.getText().toString();
                 MaterialCalendarView cal = (MaterialCalendarView)findViewById(R.id.calendarView);
-                String strChosenDate =  cal.getSelectedDate().getDay() + "-" + cal.getSelectedDate().getMonth() + "-" +
+                int correctedMonth = cal.getSelectedDate().getMonth() + 1;
+                String strChosenDate =  cal.getSelectedDate().getDay() + "-" + correctedMonth + "-" +
                         cal.getSelectedDate().getYear();
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 String[] partsDate = strChosenDate.split(Pattern.quote("-"));
                 // TODO : Gérer les exceptions :
                 int day = 1, month = 1, year = 2000;
                 day = Integer.parseInt(partsDate[0]);
-                month = Integer.parseInt(partsDate[1]) - 1;
+                month = Integer.parseInt(partsDate[1]);
                 year = Integer.parseInt(partsDate[2]);
                 DatabaseReference myRef = database.getReference(strChosenDate);
                 if(!bookedDays.contains(CalendarDay.from(year, month, day))) {
@@ -102,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                     String[] partsDate = sd.toString().split(Pattern.quote("-"));
                     // TODO : Gérer les exceptions :
                     day = Integer.parseInt(partsDate[0]);
-                    month = Integer.parseInt(partsDate[1]) + 1;
+                    month = Integer.parseInt(partsDate[1]) - 1;
                     year = Integer.parseInt(partsDate[2]);
                     updatedBookedDays.add(CalendarDay.from(year, month, day));
                     agenda.addDecorator(new EventDecorator(Color.RED, updatedBookedDays));

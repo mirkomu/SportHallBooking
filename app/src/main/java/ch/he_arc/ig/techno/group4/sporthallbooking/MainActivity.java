@@ -33,6 +33,34 @@ public class MainActivity extends AppCompatActivity {
         agenda.setDateSelected(new Date(), true);
         final Button button = findViewById(R.id.btnReserve);
         final DatabaseReference db = FirebaseDatabase.getInstance().getReference();
+
+        final ArrayList<CalendarDay> bookedDays = new ArrayList<>();
+        db.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get dates and use the values to update the UI
+                ArrayList<CalendarDay> InitialBookedDays = new ArrayList<>();
+                int day = 1, month = 1, year = 2000;
+                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                    Object sd = snapshot.getValue();
+                    String[] partsDate = sd.toString().split(Pattern.quote("."));
+                    // TODO : Gérer les exceptions :
+                    day = Integer.parseInt(partsDate[0]);
+                    month = Integer.parseInt(partsDate[1]) - 1;
+                    year = Integer.parseInt(partsDate[2]);
+                    InitialBookedDays.add(CalendarDay.from(year, month, day));
+                    agenda.addDecorator(new EventDecorator(Color.RED, InitialBookedDays));
+                }
+                bookedDays.addAll(InitialBookedDays);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting dates failed, log a message
+            }
+        });
+
+
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 EditText nameEdit = (EditText)findViewById(R.id.editTextName);
@@ -42,7 +70,13 @@ public class MainActivity extends AppCompatActivity {
                         cal.getSelectedDate().getYear();
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference myRef = database.getReference(namePerson);
-                if(myRef == null) { // TODO : Ne fonctionne pas
+                String[] partsDate = strChosenDate.split(Pattern.quote("."));
+                // TODO : Gérer les exceptions :
+                int day = 1, month = 1, year = 2000;
+                day = Integer.parseInt(partsDate[0]);
+                month = Integer.parseInt(partsDate[1]) - 1;
+                year = Integer.parseInt(partsDate[2]);
+                if(!bookedDays.contains(CalendarDay.from(year, month, day))) {
                     myRef.setValue(strChosenDate);
                     Toast.makeText(getApplicationContext(), "Réservation pour " + namePerson + " le " + strChosenDate, Toast.LENGTH_LONG).show();
                 } else {
@@ -54,24 +88,25 @@ public class MainActivity extends AppCompatActivity {
         ValueEventListener postListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Post object and use the values to update the UI
-                ArrayList<CalendarDay> bookedDays = new ArrayList<>();
+                // Get dates and use the values to update the UI
+                ArrayList<CalendarDay> updatedBookedDays = new ArrayList<>();
                 int day = 1, month = 1, year = 2000;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Object sd = snapshot.getValue();
                     String[] partsDate = sd.toString().split(Pattern.quote("."));
                     // TODO : Gérer les exceptions :
                     day = Integer.parseInt(partsDate[0]);
-                    month = Integer.parseInt(partsDate[1]); // TODO : Mois incorrects dans le calendrier ?
+                    month = Integer.parseInt(partsDate[1]) - 1;
                     year = Integer.parseInt(partsDate[2]);
+                    updatedBookedDays.add(CalendarDay.from(year, month, day));
+                    agenda.addDecorator(new EventDecorator(Color.RED, updatedBookedDays));
+                    bookedDays.add(CalendarDay.from(year, month, day));
                 }
-                bookedDays.add( CalendarDay.from(year, month, day));
-                agenda.addDecorator(new EventDecorator(Color.RED, bookedDays));
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
+                // Getting dates failed, log a message
             }
         };
 

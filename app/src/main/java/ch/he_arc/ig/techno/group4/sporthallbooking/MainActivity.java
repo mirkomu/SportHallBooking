@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -21,16 +22,22 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
+
+    // Variables et éléments UI utilisés dans cette activité
     MaterialCalendarView agenda;
     Button button;
     DatabaseReference db;
-    ArrayList<CalendarDay> bookedDays;
+    HashMap<CalendarDay, String> bookedDays;
     ValueEventListener postListener;
 
+    // Evénement : Quand l'application s'ouverte; on initialise les éléments
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,94 +47,108 @@ public class MainActivity extends AppCompatActivity {
         agenda.setDateSelected(new Date(), true);
         button = findViewById(R.id.btnReserve);
         db = FirebaseDatabase.getInstance().getReference();
-        bookedDays  = new ArrayList<>();
+        bookedDays  = new HashMap<CalendarDay, String>();
 
+        // Evénement : Quand l'application est intialisé; on lis les valeurs de Firebase une première fois
         db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // Get dates and use the values to update the UI
-                ArrayList<CalendarDay> InitialBookedDays = new ArrayList<>();
+                HashMap<CalendarDay, String> InitialBookedDays = new HashMap<CalendarDay, String>();
                 int day = 1, month = 1, year = 2000;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Object sd = snapshot.getKey();
-                    String[] partsDate = sd.toString().split(Pattern.quote("-"));
-                    // TODO : Gérer les exceptions :
-                    day = Integer.parseInt(partsDate[0]);
-                    month = Integer.parseInt(partsDate[1]) - 1;
-                    year = Integer.parseInt(partsDate[2]);
-                    InitialBookedDays.add(CalendarDay.from(year, month, day));
-                    agenda.addDecorator(new EventDecorator(Color.RED, InitialBookedDays));
+                    try {
+                        String[] partsDate = snapshot.getKey().toString().split(Pattern.quote("-"));
+                        day = Integer.parseInt(partsDate[0]);
+                        month = Integer.parseInt(partsDate[1]) - 1;
+                        year = Integer.parseInt(partsDate[2]);
+                        InitialBookedDays.put(CalendarDay.from(year, month, day), snapshot.getValue().toString());
+                        agenda.addDecorator(new EventDecorator(Color.RED, InitialBookedDays.keySet()));
+                    } catch (Exception e) {
+                        // Elements vides dans la BDD ? -> Pas besoin d'afficher d'erreur
+                    }
                 }
-                bookedDays.addAll(InitialBookedDays);
+                bookedDays.putAll(InitialBookedDays);
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(), "Erreur de mise à jour de la base de donnée.",
-                        Toast.LENGTH_SHORT).show();
+                diplayToast("Erreur de mise à jour de la base de donnée.");
             }
         });
 
+        // Evénement : Quand le bouton de réservation est cliqué; on réserve la date
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 EditText nameEdit = (EditText)findViewById(R.id.editTextName);
-                String namePerson = nameEdit.getText().toString();
-                MaterialCalendarView cal = (MaterialCalendarView)findViewById(R.id.calendarView);
-                int correctedMonth = cal.getSelectedDate().getMonth() + 1;
-                String strChosenDate =  cal.getSelectedDate().getDay() + "-" + correctedMonth + "-" +
-                        cal.getSelectedDate().getYear();
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                String[] partsDate = strChosenDate.split(Pattern.quote("-"));
-                try {
-                    int day = 1, month = 1, year = 2000;
-                    day = Integer.parseInt(partsDate[0]);
-                    month = Integer.parseInt(partsDate[1]);
-                    year = Integer.parseInt(partsDate[2]);
-                    DatabaseReference myRef = database.getReference(strChosenDate);
-                    if(!bookedDays.contains(CalendarDay.from(year, month, day))) {
-                        myRef.setValue(namePerson);
-                        Toast.makeText(getApplicationContext(), "Réservation pour " + namePerson + " le " + strChosenDate, Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Erreur, il y a déjà une réservation pour " + myRef.toString() + " le " + strChosenDate + ". Date non réservée.",
-                                Toast.LENGTH_LONG).show();
+                if(nameEdit.getText().length() == 0) {
+                    diplayToast("Veuillez indiquer votre nom.");
+                } else {
+                    String namePerson = nameEdit.getText().toString();
+                    MaterialCalendarView cal = (MaterialCalendarView) findViewById(R.id.calendarView);
+                    int correctedMonth = cal.getSelectedDate().getMonth() + 1;
+                    String strChosenDate = cal.getSelectedDate().getDay() + "-" + correctedMonth + "-" +
+                            cal.getSelectedDate().getYear();
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    String[] partsDate = strChosenDate.split(Pattern.quote("-"));
+                    try {
+                        int day = 1, month = 1, year = 2000;
+                        day = Integer.parseInt(partsDate[0]);
+                        year = Integer.parseInt(partsDate[2]);
+                        DatabaseReference myRef = database.getReference(strChosenDate);
+                        String alreadyExistsName = "";
+                        for (Map.Entry<CalendarDay, String> dateBooked : bookedDays.entrySet()) {
+                            int MonthCorrected = (dateBooked.getKey().getMonth() + 1);
+                            String strDateBooked = dateBooked.getKey().getDay() + "-" + MonthCorrected + "-" + dateBooked.getKey().getYear();
+                            if (strChosenDate.equals(strDateBooked)) {
+                                alreadyExistsName = dateBooked.getValue();
+                                break;
+                            }
+                        }
+                        if (alreadyExistsName == "") {
+                            myRef.setValue(namePerson);
+                            diplayToast("Réservation pour " + namePerson + " le " + strChosenDate + " effectuée");
+                        } else {
+                            diplayToast("Erreur, il y a déjà une réservation pour " + alreadyExistsName + " le " + strChosenDate + ". Date non réservée.");
+                        }
+                    } catch (NumberFormatException e) {
+                        diplayToast("Désolé, une erreur de date est survenue.");
                     }
-                } catch (NumberFormatException e) {
-                    Toast.makeText(getApplicationContext(), "Désolé, une erreur de date est survenue.",
-                            Toast.LENGTH_LONG).show();
                 }
             }
         });
 
-        ValueEventListener postListener = new ValueEventListener() {
+        // Evénement : Quand une donnée est mise à jour dans FireBase; on met à jour notre UI
+        ValueEventListener dataListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get dates and use the values to update the UI
                 ArrayList<CalendarDay> updatedBookedDays = new ArrayList<>();
                 int day = 1, month = 1, year = 2000;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    Object sd = snapshot.getKey();
-                    String[] partsDate = sd.toString().split(Pattern.quote("-"));
+                    String[] partsDate = snapshot.getKey().toString().split(Pattern.quote("-"));
                     try {
                         day = Integer.parseInt(partsDate[0]);
                         month = Integer.parseInt(partsDate[1]) - 1;
                         year = Integer.parseInt(partsDate[2]);
                         updatedBookedDays.add(CalendarDay.from(year, month, day));
                         agenda.addDecorator(new EventDecorator(Color.RED, updatedBookedDays));
-                        bookedDays.add(CalendarDay.from(year, month, day));
+                        bookedDays.put(CalendarDay.from(year, month, day), snapshot.getValue().toString());
                     } catch (NumberFormatException e) {
-                        Toast.makeText(getApplicationContext(), "Désolé, une erreur de date est survenue.",
-                                Toast.LENGTH_LONG).show();
+                        diplayToast("Désolé, une erreur de date est survenue.");
                     }
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(), "Erreur de mise à jour de la base de donnée.",
-                        Toast.LENGTH_SHORT).show();
+                diplayToast("Erreur de mise à jour de la base de donnée.");
             }
         };
+        db.addValueEventListener(dataListener);
+    }
 
-        db.addValueEventListener(postListener);
+    // Affichage d'une notification rapide de type toast pour l'utilisateur :
+    public void diplayToast(String message) {
+        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 50);
+        toast.show();
     }
 }

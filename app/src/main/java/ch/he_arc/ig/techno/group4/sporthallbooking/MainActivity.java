@@ -17,6 +17,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -62,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Getting dates failed, log a message
+                Toast.makeText(getApplicationContext(), "Erreur de mise à jour de la base de donnée.",
+                        Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -76,17 +78,21 @@ public class MainActivity extends AppCompatActivity {
                         cal.getSelectedDate().getYear();
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 String[] partsDate = strChosenDate.split(Pattern.quote("-"));
-                // TODO : Gérer les exceptions :
-                int day = 1, month = 1, year = 2000;
-                day = Integer.parseInt(partsDate[0]);
-                month = Integer.parseInt(partsDate[1]);
-                year = Integer.parseInt(partsDate[2]);
-                DatabaseReference myRef = database.getReference(strChosenDate);
-                if(!bookedDays.contains(CalendarDay.from(year, month, day))) {
-                    myRef.setValue(namePerson);
-                    Toast.makeText(getApplicationContext(), "Réservation pour " + namePerson + " le " + strChosenDate, Toast.LENGTH_LONG).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Erreur, il y a déjà une réservation pour " + myRef.toString() + " le " + strChosenDate + ". Date non réservée.",
+                try {
+                    int day = 1, month = 1, year = 2000;
+                    day = Integer.parseInt(partsDate[0]);
+                    month = Integer.parseInt(partsDate[1]);
+                    year = Integer.parseInt(partsDate[2]);
+                    DatabaseReference myRef = database.getReference(strChosenDate);
+                    if(!bookedDays.contains(CalendarDay.from(year, month, day))) {
+                        myRef.setValue(namePerson);
+                        Toast.makeText(getApplicationContext(), "Réservation pour " + namePerson + " le " + strChosenDate, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Erreur, il y a déjà une réservation pour " + myRef.toString() + " le " + strChosenDate + ". Date non réservée.",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } catch (NumberFormatException e) {
+                    Toast.makeText(getApplicationContext(), "Désolé, une erreur de date est survenue.",
                             Toast.LENGTH_LONG).show();
                 }
             }
@@ -101,19 +107,24 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     Object sd = snapshot.getKey();
                     String[] partsDate = sd.toString().split(Pattern.quote("-"));
-                    // TODO : Gérer les exceptions :
-                    day = Integer.parseInt(partsDate[0]);
-                    month = Integer.parseInt(partsDate[1]) - 1;
-                    year = Integer.parseInt(partsDate[2]);
-                    updatedBookedDays.add(CalendarDay.from(year, month, day));
-                    agenda.addDecorator(new EventDecorator(Color.RED, updatedBookedDays));
-                    bookedDays.add(CalendarDay.from(year, month, day));
+                    try {
+                        day = Integer.parseInt(partsDate[0]);
+                        month = Integer.parseInt(partsDate[1]) - 1;
+                        year = Integer.parseInt(partsDate[2]);
+                        updatedBookedDays.add(CalendarDay.from(year, month, day));
+                        agenda.addDecorator(new EventDecorator(Color.RED, updatedBookedDays));
+                        bookedDays.add(CalendarDay.from(year, month, day));
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(getApplicationContext(), "Désolé, une erreur de date est survenue.",
+                                Toast.LENGTH_LONG).show();
+                    }
                 }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                // Getting dates failed, log a message
+                Toast.makeText(getApplicationContext(), "Erreur de mise à jour de la base de donnée.",
+                        Toast.LENGTH_SHORT).show();
             }
         };
 

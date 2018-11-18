@@ -1,10 +1,11 @@
 package ch.he_arc.ig.techno.group4.sporthallbooking;
 
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
@@ -20,15 +21,13 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
+
+import ch.he_arc.ig.techno.group4.sporthallbooking.persistance.DBOpenHelper;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,6 +37,49 @@ public class MainActivity extends AppCompatActivity {
     DatabaseReference db;
     HashMap<CalendarDay, String> bookedDays;
     ValueEventListener postListener;
+    // Base de donnée SQLITE
+    // The database
+    private SQLiteDatabase dbLocal;
+    // The database creator and updater helper
+    DBOpenHelper dbLocalOpenHelper;
+
+
+    /*********************************************************************************/
+    /** Managing LifeCycle and database open/close operations *********************************/
+    /*********************************************************************************/
+    @Override
+    protected void onResume() {
+        super.onResume();
+        openDB();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        closeDB();
+    }
+
+    /**
+     * * Open the database* *
+     *
+     * @throws SQLiteException
+     */
+    public void openDB() throws SQLiteException {
+        try {
+            dbLocal = dbLocalOpenHelper.getWritableDatabase();
+        } catch (SQLiteException ex) {
+            dbLocal = dbLocalOpenHelper.getReadableDatabase();
+        }
+    }
+
+    /**
+     * Close Database
+     */
+    public void closeDB() {
+        dbLocal.close();
+    }
+
+    /*********************************************************************************/
 
     // Evénement : Quand l'application s'ouverte; on initialise les éléments
     @Override
@@ -50,6 +92,14 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.btnReserve);
         db = FirebaseDatabase.getInstance().getReference();
         bookedDays  = new HashMap<CalendarDay, String>();
+
+        //Initalisation de la base de donnée local (SQLITE)
+        // Create or retrieve the database
+        dbLocalOpenHelper = new DBOpenHelper(this, DBOpenHelper.Constants.DATABASE_NAME, null,
+                DBOpenHelper.Constants.DATABASE_VERSION);
+
+        // open the database
+        openLocalDB();
 
         // Evénement : Quand l'application est intialisé; on lis les valeurs de Firebase une première fois
         db.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -72,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 bookedDays.putAll(InitialBookedDays);
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 diplayToast("Erreur de mise à jour de la base de donnée.");
@@ -139,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 diplayToast("Erreur de mise à jour de la base de donnée.");

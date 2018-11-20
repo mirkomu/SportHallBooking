@@ -1,5 +1,6 @@
 package ch.he_arc.ig.techno.group4.sporthallbooking.persistance;
 
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -23,24 +24,18 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         // les mêmes que ceux de
         // votre base, de même pour les index.
         // My Column ID and the associated explanation for end-users
-        public static final String KEY_COL_ID = "_id";// Mandatory
+        public static final String KEY_COL_ID = "id";// Mandatory
 
         // My Column Name and the associated explanation for end-users
-        public static final String KEY_COL_LASTNAME = "lastName";
-
-        // My Column First Name and the associated explanation for end-users
-        public static final String KEY_COL_FIRSTNAME = "firstName";
+        public static final String KEY_COL_NAME = "name";
 
 
         // Index des colonnes
         // The index of the column ID
         public static final int ID_COLUMN = 1;
 
-        // The index of the column FIRST NAME
-        public static final int FIRSTNAME_COLUMN = 2;
-
-        // The index of the column LASTNAME
-        public static final int LASTNAME_COLUMN = 3;
+        // The index of the column NAME
+        public static final int NAME_COLUMN = 2;
 
     }
 
@@ -48,8 +43,7 @@ public class DBOpenHelper extends SQLiteOpenHelper {
     private static final String DATABASE_CREATE = "create table "
             + Constants.MY_TABLE + "(" + Constants.KEY_COL_ID
             + " integer primary key autoincrement, "
-            + " INTEGER, " + Constants.KEY_COL_FIRSTNAME + " TEXT, "
-            + Constants.KEY_COL_LASTNAME + " TEXT)";
+            + Constants.KEY_COL_NAME + " TEXT) ";
 
 
     /**
@@ -82,6 +76,3 @@ public class DBOpenHelper extends SQLiteOpenHelper {
         // or do a smartest stuff
     }
 }
-
-
-

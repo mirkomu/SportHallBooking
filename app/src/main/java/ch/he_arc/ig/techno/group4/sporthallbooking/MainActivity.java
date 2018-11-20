@@ -1,5 +1,7 @@
 package ch.he_arc.ig.techno.group4.sporthallbooking;
 
+import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Color;
@@ -50,13 +52,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        openDB();
+        openLocalDB();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        closeDB();
+        closeLocalDB();
     }
 
     /**
@@ -64,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
      *
      * @throws SQLiteException
      */
-    public void openDB() throws SQLiteException {
+    public void openLocalDB() throws SQLiteException {
         try {
             dbLocal = dbLocalOpenHelper.getWritableDatabase();
         } catch (SQLiteException ex) {
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Close Database
      */
-    public void closeDB() {
+    public void closeLocalDB() {
         dbLocal.close();
     }
 
@@ -132,11 +134,67 @@ public class MainActivity extends AppCompatActivity {
         // Evénement : Quand le bouton de réservation est cliqué; on réserve la date
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                EditText nameEdit = (EditText)findViewById(R.id.editTextName);
+
+
+                EditText nameEdit = findViewById(R.id.editTextName);
+
+                //TODO  ==> a deplacer dans methode onCreate et metre le resultat du select dans le champs texte de l'activité et tester
+                //*******
+                //SELECT
+                ////////
+                //ajout nom qui se trouve dans la  base de donnée dans le champs nom
+                //recherche des données dans la base local
+                /*
+                String[] projections = new String[] { DBOpenHelper.Constants.KEY_COL_ID,
+                        DBOpenHelper.Constants.KEY_COL_NAME};
+                final int cursorIdColNumber = 0, cursorNameColNumber = 1;
+
+                String namePerson = nameEdit.getText().toString();
+
+                String namePerson ="Toto";
+
+                String selection = DBOpenHelper.Constants.KEY_COL_ID + "=?";
+                String[] selectionArg = new String[] { "id"};
+                String orderBy = DBOpenHelper.Constants.KEY_COL_NAME + "  ASC";
+                String maxResultsListSize = "1";
+
+                Cursor cursor = dbLocal.query(DBOpenHelper.Constants.MY_TABLE, projections, selection,
+                        selectionArg, null, maxResultsListSize, orderBy);
+
+*/
+ //               String namePerson = nameEdit.getText().toString();
+
+                String namePerson ="Toto";
+
+
+
+
                 if(nameEdit.getText().length() == 0) {
+
+
+
+                    //
                     diplayToast("Veuillez indiquer votre nom.");
                 } else {
-                    String namePerson = nameEdit.getText().toString();
+                     namePerson = nameEdit.getText().toString();
+                     //****
+                     // INSERT
+                    //////
+                    //on insert le nom dans la base de donnée local
+                    ContentValues contentValues = new ContentValues();
+
+                    contentValues.put(DBOpenHelper.Constants.KEY_COL_NAME, "toto");
+                    // Insert the line in the database
+                    long rowId = dbLocal.insert(DBOpenHelper.Constants.MY_TABLE, null, contentValues);
+
+                    // Test to see if the insertion was ok
+                    if (rowId == -1) {
+                        diplayToast("Error when creating the User " + rowId);
+                    } else {
+                        diplayToast("User "+namePerson +" created and stored in local database" + rowId);
+                    }
+
+
                     MaterialCalendarView cal = (MaterialCalendarView) findViewById(R.id.calendarView);
                     int correctedMonth = cal.getSelectedDate().getMonth() + 1;
                     String strChosenDate = cal.getSelectedDate().getDay() + "-" + correctedMonth + "-" +
@@ -193,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                diplayToast("Erreur de mise à jour de la base de donnée.");
+                diplayToast("Erreur de mise à jour de la base de donnée (Firebase).");
             }
         };
         db.addValueEventListener(dataListener);
@@ -219,4 +277,41 @@ public class MainActivity extends AppCompatActivity {
         toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 225);
         toast.show();
     }
+
+
+    //affichage base de donnée SQLITE que pour test
+
+    // then browse the result:
+/*
+        if (cursor.moveToFirst()) {
+        // The elements to retrieve
+        Integer colId;
+        String name;
+        String firstname;
+        // The associated index within the cursor
+        int indexId = cursor.getColumnIndex(Constants.KEY_COL_ID);
+        int indexName = cursor.getColumnIndex(Constants.KEY_COL_NAME);
+        int indexFirstName = cursor
+                .getColumnIndex(Constants.KEY_COL_FIRSTNAME);
+        // Browse the results list:
+        int count = 0;
+        do {
+            colId = cursor.getInt(indexId);
+            name = cursor.getString(indexName);
+            firstname = cursor.getString(indexFirstName);
+            Toast.makeText(
+                    this,
+                    "Retrieve element :" + name + "," + firstname + " ("
+                            + colId + ")", Toast.LENGTH_LONG).show();
+            count++;
+        } while (cursor.moveToNext());
+        Toast.makeText(this,
+                "The number of elements retrieved is " + count,
+                Toast.LENGTH_LONG).show();
+    } else {
+        Toast.makeText(this, "No element found : ", Toast.LENGTH_LONG)
+                .show();
+    }
+
+}*/
 }

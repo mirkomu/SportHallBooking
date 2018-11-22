@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteStatement;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     HashMap<CalendarDay, String> bookedDays;
     ValueEventListener postListener;
     // Base de donnée SQLITE
+    String userName;
     // The database
     private SQLiteDatabase dbLocal;
     // The database creator and updater helper
@@ -94,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.btnReserve);
         db = FirebaseDatabase.getInstance().getReference();
         bookedDays  = new HashMap<CalendarDay, String>();
-
         //Initalisation de la base de donnée local (SQLITE)
         // Create or retrieve the database
         dbLocalOpenHelper = new DBOpenHelper(this, DBOpenHelper.Constants.DATABASE_NAME, null,
@@ -102,6 +103,35 @@ public class MainActivity extends AppCompatActivity {
 
         // open the database
         openLocalDB();
+
+
+        final EditText nameEdit = findViewById(R.id.editTextName);
+
+
+        //recherche des données dans la base local si un nom est trouvé on l'insert dans le champs nom de l'aplication
+
+        //attention le premier enregistrement commence à l'index 1 dans SQLITE
+        //on recupère le dernier enregistrement de la bd local
+        SQLiteStatement s = dbLocal.compileStatement("select count(*) " + DBOpenHelper.Constants.MY_TABLE);
+        String id = s.simpleQueryForString();
+
+        diplayToast("id bd : " + id);
+        Cursor cursor = dbLocal.rawQuery("select " + DBOpenHelper.Constants.KEY_COL_NAME + " from " + DBOpenHelper.Constants.MY_TABLE + " where id = ?", new String[]{id});
+
+        try {
+            if (cursor.moveToFirst()) {
+                userName = cursor.getString(cursor.getColumnIndex(DBOpenHelper.Constants.KEY_COL_NAME));
+                diplayToast("user in the local db " + userName);
+                if (!userName.isEmpty()) {
+                    nameEdit.setText(userName);
+                }
+            } else {
+                diplayToast("curseur vide");
+            }
+        } catch (Exception ex) {
+            diplayToast("erreur lecture db local");
+        }
+
 
         // Evénement : Quand l'application est intialisé; on lis les valeurs de Firebase une première fois
         db.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -125,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 bookedDays.putAll(InitialBookedDays);
             }
 
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 diplayToast("Erreur de mise à jour de la base de donnée.");
@@ -136,64 +167,32 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
 
 
-                EditText nameEdit = findViewById(R.id.editTextName);
-
-                //TODO  ==> a deplacer dans methode onCreate et metre le resultat du select dans le champs texte de l'activité et tester
-                //*******
-                //SELECT
-                ////////
-                //ajout nom qui se trouve dans la  base de donnée dans le champs nom
-                //recherche des données dans la base local
-                /*
-                String[] projections = new String[] { DBOpenHelper.Constants.KEY_COL_ID,
-                        DBOpenHelper.Constants.KEY_COL_NAME};
-                final int cursorIdColNumber = 0, cursorNameColNumber = 1;
-
-                String namePerson = nameEdit.getText().toString();
-
-                String namePerson ="Toto";
-
-                String selection = DBOpenHelper.Constants.KEY_COL_ID + "=?";
-                String[] selectionArg = new String[] { "id"};
-                String orderBy = DBOpenHelper.Constants.KEY_COL_NAME + "  ASC";
-                String maxResultsListSize = "1";
-
-                Cursor cursor = dbLocal.query(DBOpenHelper.Constants.MY_TABLE, projections, selection,
-                        selectionArg, null, maxResultsListSize, orderBy);
-
-*/
- //               String namePerson = nameEdit.getText().toString();
-
-                String namePerson ="Toto";
-
-
-
-
                 if(nameEdit.getText().length() == 0) {
 
-
-
-                    //
                     diplayToast("Veuillez indiquer votre nom.");
+
                 } else {
-                     namePerson = nameEdit.getText().toString();
-                     //****
-                     // INSERT
+                    String namePerson = nameEdit.getText().toString();
+                    //****
+                    // INSERT
                     //////
                     //on insert le nom dans la base de donnée local
                     ContentValues contentValues = new ContentValues();
 
-                    contentValues.put(DBOpenHelper.Constants.KEY_COL_NAME, "toto");
+                    contentValues.put(DBOpenHelper.Constants.KEY_COL_NAME, namePerson);
                     // Insert the line in the database
                     long rowId = dbLocal.insert(DBOpenHelper.Constants.MY_TABLE, null, contentValues);
 
+                    //TODO Remplacer par des logs
                     // Test to see if the insertion was ok
                     if (rowId == -1) {
                         diplayToast("Error when creating the User " + rowId);
                     } else {
-                        diplayToast("User "+namePerson +" created and stored in local database" + rowId);
+                        diplayToast("User " + namePerson + " created and stored in local database, rowId: " + rowId);
                     }
 
+
+                    //
 
                     MaterialCalendarView cal = (MaterialCalendarView) findViewById(R.id.calendarView);
                     int correctedMonth = cal.getSelectedDate().getMonth() + 1;

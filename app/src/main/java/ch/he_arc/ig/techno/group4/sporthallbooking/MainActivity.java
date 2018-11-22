@@ -198,16 +198,6 @@ public class MainActivity extends AppCompatActivity {
                         //diplayToast("User " + namePerson + " created and stored in local database, rowId: " + rowId);
                     }
 
-//=======
-                    //            EditText nameEdit = findViewById(R.id.editTextName);
-                    //            MaterialCalendarView cal = findViewById(R.id.calendarView);
-                    //=>            if(nameEdit.getText().length() == 0) {
-                    //=>                diplayToast("Veuillez indiquer votre nom.");
-        /*            } else if(cal.getSelectedDate().getDate().compareTo(new Date()) < 0) {
-                        diplayToast("La date doit être dans le futur.");
-                      } else {
-        //=>                String namePerson = nameEdit.getText().toString();
->>>>>>> master*/
                     int correctedMonth = cal.getSelectedDate().getMonth() + 1;
                     String strChosenDate = cal.getSelectedDate().getDay() + "-" + correctedMonth + "-" +
                             cal.getSelectedDate().getYear();

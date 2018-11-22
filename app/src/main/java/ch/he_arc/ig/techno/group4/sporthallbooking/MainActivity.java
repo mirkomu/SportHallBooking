@@ -101,11 +101,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        agenda = (MaterialCalendarView)findViewById(R.id.calendarView);
+        agenda = findViewById(R.id.calendarView);
         agenda.setDateSelected(new Date(), true);
         button = findViewById(R.id.btnReserve);
         db = FirebaseDatabase.getInstance().getReference();
-        bookedDays  = new HashMap<CalendarDay, String>();
+        bookedDays = new HashMap<>();
 
         //Initalisation de la base de donnée local (SQLITE)
         dbLocalOpenHelper = new DBOpenHelper(this, DBOpenHelper.Constants.DATABASE_NAME, null,
@@ -144,13 +144,13 @@ public class MainActivity extends AppCompatActivity {
         // Evénement : Quand l'application est initalisé; on lis les valeurs de Firebase une première fois
         db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 // Get dates and use the values to update the UI
-                HashMap<CalendarDay, String> InitialBookedDays = new HashMap<CalendarDay, String>();
-                int day = 1, month = 1, year = 2000;
+                HashMap<CalendarDay, String> InitialBookedDays = new HashMap<>();
+                int day, month, year;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                     try {
-                        String[] partsDate = snapshot.getKey().toString().split(Pattern.quote("-"));
+                        String[] partsDate = snapshot.getKey().split(Pattern.quote("-"));
                         day = Integer.parseInt(partsDate[0]);
                         month = Integer.parseInt(partsDate[1]) - 1;
                         year = Integer.parseInt(partsDate[2]);
@@ -164,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
                 diplayToast("Erreur de mise à jour de la base de donnée.");
             }
         });
@@ -173,9 +173,15 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
+                MaterialCalendarView cal = (MaterialCalendarView) findViewById(R.id.calendarView);
+
+
                 if(nameEdit.getText().length() == 0) {
                     diplayToast("Veuillez indiquer votre nom.");
+                } else if (cal.getSelectedDate().getDate().compareTo(new Date()) < 0)
 
+                {
+                    diplayToast("La date doit être dans le futur.");
                 } else {
                     String namePerson = nameEdit.getText().toString();
                     //Save the user name in the local database
@@ -192,17 +198,23 @@ public class MainActivity extends AppCompatActivity {
                         //diplayToast("User " + namePerson + " created and stored in local database, rowId: " + rowId);
                     }
 
-                    MaterialCalendarView cal = (MaterialCalendarView) findViewById(R.id.calendarView);
+//=======
+                    //            EditText nameEdit = findViewById(R.id.editTextName);
+                    //            MaterialCalendarView cal = findViewById(R.id.calendarView);
+                    //=>            if(nameEdit.getText().length() == 0) {
+                    //=>                diplayToast("Veuillez indiquer votre nom.");
+        /*            } else if(cal.getSelectedDate().getDate().compareTo(new Date()) < 0) {
+                        diplayToast("La date doit être dans le futur.");
+                      } else {
+        //=>                String namePerson = nameEdit.getText().toString();
+>>>>>>> master*/
                     int correctedMonth = cal.getSelectedDate().getMonth() + 1;
                     String strChosenDate = cal.getSelectedDate().getDay() + "-" + correctedMonth + "-" +
                             cal.getSelectedDate().getYear();
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
-                    String[] partsDate = strChosenDate.split(Pattern.quote("-"));
                     try {
-                        int day = 1, month = 1, year = 2000;
-                        day = Integer.parseInt(partsDate[0]);
-                        year = Integer.parseInt(partsDate[2]);
-                        DatabaseReference myRef = database.getReference(strChosenDate);
+                        DatabaseReference myRef;
+                        myRef = database.getReference(strChosenDate);
                         String alreadyExistsName = "";
                         for (Map.Entry<CalendarDay, String> dateBooked : bookedDays.entrySet()) {
                             int MonthCorrected = (dateBooked.getKey().getMonth() + 1);
@@ -212,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
                                 break;
                             }
                         }
-                        if (alreadyExistsName == "") {
+                        if (alreadyExistsName.equals("")) {
                             myRef.setValue(namePerson);
                             diplayToast("Réservation pour " + namePerson + " le " + strChosenDate + " effectuée");
                         } else {
@@ -228,11 +240,11 @@ public class MainActivity extends AppCompatActivity {
         // Evénement : Quand une donnée est mise à jour dans FireBase; on met à jour notre UI
         ValueEventListener dataListener = new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 ArrayList<CalendarDay> updatedBookedDays = new ArrayList<>();
-                int day = 1, month = 1, year = 2000;
+                int day, month, year;
                 for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                    String[] partsDate = snapshot.getKey().toString().split(Pattern.quote("-"));
+                    String[] partsDate = snapshot.getKey().split(Pattern.quote("-"));
                     try {
                         day = Integer.parseInt(partsDate[0]);
                         month = Integer.parseInt(partsDate[1]) - 1;
@@ -247,8 +259,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-                diplayToast("Erreur de mise à jour de la base de donnée (Firebase).");
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                diplayToast("Erreur de mise à jour de la base de donnée  (Firebase).");
             }
         };
         db.addValueEventListener(dataListener);

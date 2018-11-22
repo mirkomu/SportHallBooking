@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity {
 
     /*********************************************************************************/
 
+
     // Evénement : Quand l'application s'ouverte; on initialise les éléments
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -198,6 +199,7 @@ public class MainActivity extends AppCompatActivity {
                         //diplayToast("User " + namePerson + " created and stored in local database, rowId: " + rowId);
                     }
 
+
                     int correctedMonth = cal.getSelectedDate().getMonth() + 1;
                     String strChosenDate = cal.getSelectedDate().getDay() + "-" + correctedMonth + "-" +
                             cal.getSelectedDate().getYear();
@@ -251,6 +253,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 diplayToast("Erreur de mise à jour de la base de donnée  (Firebase).");
+
             }
         };
         db.addValueEventListener(dataListener);

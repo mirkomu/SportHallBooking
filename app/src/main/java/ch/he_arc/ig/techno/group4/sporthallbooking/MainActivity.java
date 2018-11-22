@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     /*********************************************************************************/
-    /** Managing LifeCycle and database open/close operations *********************************/
+    /** Managing LifeCycle and database open/close operations ************************/
     /*********************************************************************************/
     @Override
     protected void onResume() {
@@ -84,6 +84,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /*********************************************************************************/
+    /** Methode  personalisé   *******************************************************/
+    /*********************************************************************************/
+    // Affichage d'une notification rapide de type toast pour l'utilisateur :
+    public void diplayToast(String message) {
+        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.TOP | Gravity.CENTER_HORIZONTAL, 0, 225);
+        toast.show();
+    }
+
+    /*********************************************************************************/
 
     // Evénement : Quand l'application s'ouverte; on initialise les éléments
     @Override
@@ -96,44 +106,42 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.btnReserve);
         db = FirebaseDatabase.getInstance().getReference();
         bookedDays  = new HashMap<CalendarDay, String>();
+
         //Initalisation de la base de donnée local (SQLITE)
-        // Create or retrieve the database
         dbLocalOpenHelper = new DBOpenHelper(this, DBOpenHelper.Constants.DATABASE_NAME, null,
                 DBOpenHelper.Constants.DATABASE_VERSION);
-
         // open the database
         openLocalDB();
-
-
+        
         final EditText nameEdit = findViewById(R.id.editTextName);
-
 
         //recherche des données dans la base local si un nom est trouvé on l'insert dans le champs nom de l'aplication
 
         //attention le premier enregistrement commence à l'index 1 dans SQLITE
         //on recupère le dernier enregistrement de la bd local
+        //TODO le select ne fonctionne pas correctement retoune toujours 1
         SQLiteStatement s = dbLocal.compileStatement("select count(*) " + DBOpenHelper.Constants.MY_TABLE);
         String id = s.simpleQueryForString();
 
-        diplayToast("id bd : " + id);
+        //diplayToast("id bd : " + id);
         Cursor cursor = dbLocal.rawQuery("select " + DBOpenHelper.Constants.KEY_COL_NAME + " from " + DBOpenHelper.Constants.MY_TABLE + " where id = ?", new String[]{id});
-
+        //TODO remplacer les displayToast par des log
         try {
             if (cursor.moveToFirst()) {
                 userName = cursor.getString(cursor.getColumnIndex(DBOpenHelper.Constants.KEY_COL_NAME));
-                diplayToast("user in the local db " + userName);
+                //diplayToast("user in the local db " + userName);
                 if (!userName.isEmpty()) {
                     nameEdit.setText(userName);
                 }
             } else {
-                diplayToast("curseur vide");
+                // diplayToast("curseur vide");
             }
         } catch (Exception ex) {
             diplayToast("erreur lecture db local");
         }
 
 
-        // Evénement : Quand l'application est intialisé; on lis les valeurs de Firebase une première fois
+        // Evénement : Quand l'application est initalisé; on lis les valeurs de Firebase une première fois
         db.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -155,7 +163,6 @@ public class MainActivity extends AppCompatActivity {
                 bookedDays.putAll(InitialBookedDays);
             }
 
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 diplayToast("Erreur de mise à jour de la base de donnée.");
@@ -166,19 +173,13 @@ public class MainActivity extends AppCompatActivity {
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-
                 if(nameEdit.getText().length() == 0) {
-
                     diplayToast("Veuillez indiquer votre nom.");
 
                 } else {
                     String namePerson = nameEdit.getText().toString();
-                    //****
-                    // INSERT
-                    //////
-                    //on insert le nom dans la base de donnée local
+                    //Save the user name in the local database
                     ContentValues contentValues = new ContentValues();
-
                     contentValues.put(DBOpenHelper.Constants.KEY_COL_NAME, namePerson);
                     // Insert the line in the database
                     long rowId = dbLocal.insert(DBOpenHelper.Constants.MY_TABLE, null, contentValues);
@@ -188,11 +189,8 @@ public class MainActivity extends AppCompatActivity {
                     if (rowId == -1) {
                         diplayToast("Error when creating the User " + rowId);
                     } else {
-                        diplayToast("User " + namePerson + " created and stored in local database, rowId: " + rowId);
+                        //diplayToast("User " + namePerson + " created and stored in local database, rowId: " + rowId);
                     }
-
-
-                    //
 
                     MaterialCalendarView cal = (MaterialCalendarView) findViewById(R.id.calendarView);
                     int correctedMonth = cal.getSelectedDate().getMonth() + 1;
@@ -270,47 +268,5 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // Affichage d'une notification rapide de type toast pour l'utilisateur :
-    public void diplayToast(String message) {
-        Toast toast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.TOP|Gravity.CENTER_HORIZONTAL, 0, 225);
-        toast.show();
-    }
 
-
-    //affichage base de donnée SQLITE que pour test
-
-    // then browse the result:
-/*
-        if (cursor.moveToFirst()) {
-        // The elements to retrieve
-        Integer colId;
-        String name;
-        String firstname;
-        // The associated index within the cursor
-        int indexId = cursor.getColumnIndex(Constants.KEY_COL_ID);
-        int indexName = cursor.getColumnIndex(Constants.KEY_COL_NAME);
-        int indexFirstName = cursor
-                .getColumnIndex(Constants.KEY_COL_FIRSTNAME);
-        // Browse the results list:
-        int count = 0;
-        do {
-            colId = cursor.getInt(indexId);
-            name = cursor.getString(indexName);
-            firstname = cursor.getString(indexFirstName);
-            Toast.makeText(
-                    this,
-                    "Retrieve element :" + name + "," + firstname + " ("
-                            + colId + ")", Toast.LENGTH_LONG).show();
-            count++;
-        } while (cursor.moveToNext());
-        Toast.makeText(this,
-                "The number of elements retrieved is " + count,
-                Toast.LENGTH_LONG).show();
-    } else {
-        Toast.makeText(this, "No element found : ", Toast.LENGTH_LONG)
-                .show();
-    }
-
-}*/
 }

@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                 DBOpenHelper.Constants.DATABASE_VERSION);
         // open the database
         openLocalDB();
-        
+
         final EditText nameEdit = findViewById(R.id.editTextName);
 
         //recherche des données dans la base local si un nom est trouvé on l'insert dans le champs nom de l'aplication

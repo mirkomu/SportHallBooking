@@ -8,8 +8,11 @@ import android.database.sqlite.SQLiteStatement;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -46,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     private SQLiteDatabase dbLocal;
     // The database creator and updater helper
     DBOpenHelper dbLocalOpenHelper;
+    private DrawerLayout mDrawerLayout;
 
 
     /*********************************************************************************/
@@ -102,11 +106,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mDrawerLayout = findViewById(R.id.drawer_layout);
         agenda = findViewById(R.id.calendarView);
         agenda.setDateSelected(new Date(), true);
         button = findViewById(R.id.btnReserve);
         db = FirebaseDatabase.getInstance().getReference();
         bookedDays = new HashMap<>();
+
+        //Menu de navigation
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+                new NavigationView.OnNavigationItemSelectedListener() {
+                    @Override
+                    public boolean onNavigationItemSelected(MenuItem menuItem) {
+                        // set item as selected to persist highlight
+                        menuItem.setChecked(true);
+                        // close drawer when item is tapped
+                        mDrawerLayout.closeDrawers();
+
+                        // Add code here to update the UI based on the item selected
+                        // For example, swap UI fragments here
+
+                        return true;
+                    }
+                });
+
+
 
         //Initalisation de la base de donnée local (SQLITE)
         dbLocalOpenHelper = new DBOpenHelper(this, DBOpenHelper.Constants.DATABASE_NAME, null,
@@ -272,6 +297,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 
 }

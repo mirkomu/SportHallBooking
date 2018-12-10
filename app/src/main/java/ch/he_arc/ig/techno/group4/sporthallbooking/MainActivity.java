@@ -37,14 +37,13 @@ import ch.he_arc.ig.techno.group4.sporthallbooking.persistance.DBOpenHelper;
 
 public class MainActivity extends AppCompatActivity {
 
+    MyApplication mApp = new MyApplication();
+
     // Variables et éléments UI utilisés dans cette activité
     MaterialCalendarView agenda;
     Button button;
     DatabaseReference db;
-    HashMap<CalendarDay, String> bookedDays;
     ValueEventListener postListener;
-    // Base de donnée SQLITE
-    String userName;
     // The database
     private SQLiteDatabase dbLocal;
     // The database creator and updater helper
@@ -111,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         agenda.setDateSelected(new Date(), true);
         button = findViewById(R.id.btnReserve);
         db = FirebaseDatabase.getInstance().getReference();
-        bookedDays = new HashMap<>();
+        mApp.bookedDays = new HashMap<>();
 
         //Menu de navigation
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -154,10 +153,10 @@ public class MainActivity extends AppCompatActivity {
         //TODO remplacer les displayToast par des log
         try {
             if (cursor.moveToFirst()) {
-                userName = cursor.getString(cursor.getColumnIndex(DBOpenHelper.Constants.KEY_COL_NAME));
-                //diplayToast("user in the local db " + userName);
-                if (!userName.isEmpty()) {
-                    nameEdit.setText(userName);
+                mApp.userName = cursor.getString(cursor.getColumnIndex(DBOpenHelper.Constants.KEY_COL_NAME));
+                //diplayToast("user in the local db " + mApp.userName);
+                if (!mApp.userName.isEmpty()) {
+                    nameEdit.setText(mApp.userName);
                 }
             } else {
                 // diplayToast("curseur vide");
@@ -186,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                         // Elements vides dans la BDD ? -> Pas besoin d'afficher d'erreur
                     }
                 }
-                bookedDays.putAll(InitialBookedDays);
+                mApp.bookedDays.putAll(InitialBookedDays);
             }
 
             @Override
@@ -233,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
                         DatabaseReference myRef;
                         myRef = database.getReference(strChosenDate);
                         String alreadyExistsName = "";
-                        for (Map.Entry<CalendarDay, String> dateBooked : bookedDays.entrySet()) {
+                        for (Map.Entry<CalendarDay, String> dateBooked : mApp.bookedDays.entrySet()) {
                             int MonthCorrected = (dateBooked.getKey().getMonth() + 1);
                             String strDateBooked = dateBooked.getKey().getDay() + "-" + MonthCorrected + "-" + dateBooked.getKey().getYear();
                             if (strChosenDate.equals(strDateBooked)) {
@@ -268,7 +267,7 @@ public class MainActivity extends AppCompatActivity {
                         year = Integer.parseInt(partsDate[2]);
                         updatedBookedDays.add(CalendarDay.from(year, month, day));
                         agenda.addDecorator(new EventDecorator(Color.RED, updatedBookedDays));
-                        bookedDays.put(CalendarDay.from(year, month, day), snapshot.getValue().toString());
+                        mApp.bookedDays.put(CalendarDay.from(year, month, day), snapshot.getValue().toString());
                     } catch (NumberFormatException e) {
                         diplayToast("Désolé, une erreur de date est survenue.");
                     }
@@ -286,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
         agenda.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
-                for (Map.Entry<CalendarDay, String> dateBooked : bookedDays.entrySet()) {
+                for (Map.Entry<CalendarDay, String> dateBooked : mApp.bookedDays.entrySet()) {
                     //int MonthCorrected = (dateBooked.getKey().getMonth() + 1);
                     //String strDateBooked = dateBooked.getKey().getDay() + "-" + MonthCorrected + "-" + dateBooked.getKey().getYear();
                     if (date.getDate().compareTo(dateBooked.getKey().getDate()) == 0) {

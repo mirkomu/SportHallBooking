@@ -1,10 +1,12 @@
 package ch.he_arc.ig.techno.group4.sporthallbooking;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -26,8 +28,15 @@ public class GestionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gestion);
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
 
+        //ajoute du nom
+        MyApplication mApp = new MyApplication();
+        final EditText nameEdit = findViewById(R.id.editTextName);
+
+//editTextName
+      
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
 
 
     // données du tableau
@@ -66,6 +75,16 @@ public class GestionActivity extends AppCompatActivity {
                  @Override
                  public void onClick(View v) {
                      // faites ici ce que vous voulez
+
+
+                     Context context = getApplicationContext();
+
+                     int duration = Toast.LENGTH_SHORT;
+
+                   //  Integer j = id;
+
+                     Toast.makeText(context, String.valueOf(id), duration).show();
+
 
                      diplayToast("clique ok");                 }
              });

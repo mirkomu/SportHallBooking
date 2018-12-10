@@ -16,11 +16,11 @@
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginBottom="16dp"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
 
 
         <TableLayout
@@ -31,6 +31,19 @@
 
     </ScrollView>
 
+    <TextView
+        android:id="@+id/editTextName"
+        android:layout_width="210dp"
+        android:layout_height="34dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginRight="24dp"
+        android:layout_marginBottom="16dp"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/scrollView1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.363" />
 
 
 </android.support.constraint.ConstraintLayout>

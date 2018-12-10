@@ -1,6 +1,7 @@
 package ch.he_arc.ig.techno.group4.sporthallbooking;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -124,6 +125,8 @@ public class MainActivity extends AppCompatActivity {
                         mDrawerLayout.closeDrawers();
 
                         // Add code here to update the UI based on the item selected
+                        //Intent intent = new Intent(MainActivity.this.getContext, GestionActivity.class);
+                        //this.startActivity(intent);
                         // For example, swap UI fragments here
 
                         return true;

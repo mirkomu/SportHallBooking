@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import ch.he_arc.ig.techno.group4.sporthallbooking.firebase.Firebase;
 import ch.he_arc.ig.techno.group4.sporthallbooking.persistance.DBOpenHelper;
 
 import static android.provider.AlarmClock.EXTRA_MESSAGE;
@@ -206,7 +207,10 @@ public class MainActivity extends AppCompatActivity {
                     int correctedMonth = cal.getSelectedDate().getMonth() + 1;
                     String strChosenDate = cal.getSelectedDate().getDay() + "-" + correctedMonth + "-" +
                             cal.getSelectedDate().getYear();
-                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+                    Firebase.save(strChosenDate, namePerson, mApp);
+
+     /*               FirebaseDatabase database = FirebaseDatabase.getInstance();
                     try {
                         DatabaseReference myRef;
                         myRef = database.getReference(strChosenDate);
@@ -228,6 +232,7 @@ public class MainActivity extends AppCompatActivity {
                     } catch (NumberFormatException e) {
                         diplayToast("Désolé, une erreur de date est survenue.");
                     }
+                    */
                 }
             }
         });

@@ -1,6 +1,7 @@
 package ch.he_arc.ig.techno.group4.sporthallbooking;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -32,6 +33,8 @@ import java.util.regex.Pattern;
 
 import ch.he_arc.ig.techno.group4.sporthallbooking.persistance.DBOpenHelper;
 
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
+
 public class MainActivity extends AppCompatActivity {
 
     MyApplication mApp = new MyApplication();
@@ -39,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     // Variables et éléments UI utilisés dans cette activité
     MaterialCalendarView agenda;
     Button button;
+    Button buttonGestionReservation;
     DatabaseReference db;
     ValueEventListener postListener;
     // The database
@@ -106,6 +110,8 @@ public class MainActivity extends AppCompatActivity {
         button = findViewById(R.id.btnReserve);
         db = FirebaseDatabase.getInstance().getReference();
         mApp.bookedDays = new HashMap<>();
+
+        buttonGestionReservation = findViewById(R.id.btnGestReservation);
 
         //Initalisation de la base de donnée local (SQLITE)
         dbLocalOpenHelper = new DBOpenHelper(this, DBOpenHelper.Constants.DATABASE_NAME, null,
@@ -178,9 +184,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if(nameEdit.getText().length() == 0) {
                     diplayToast("Veuillez indiquer votre nom.");
-                } else if (cal.getSelectedDate().getDate().compareTo(new Date()) < 0)
-
-                {
+                } else if (cal.getSelectedDate().getDate().compareTo(new Date()) < 0) {
                     diplayToast("La date doit être dans le futur.");
                 } else {
                     String namePerson = nameEdit.getText().toString();
@@ -268,6 +272,22 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     }
                 }
+            }
+        });
+
+
+        //button gestionReservation (GestionActivity
+
+        // Evénement : Quand le bouton gèrer les réservations est cliqué; ouvre l'activity "GestionActivity
+        buttonGestionReservation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, GestionActivity.class);
+                String message = MyApplication.userName;
+                intent.putExtra(EXTRA_MESSAGE, message); //cette ligne est essanciel même si on utilise directement les objets de la classe MyApplication
+                // intent.putExtra("KEY", MyApplication.bookedDays); startActivity(intent);
+
+                startActivity(intent);
             }
         });
     }

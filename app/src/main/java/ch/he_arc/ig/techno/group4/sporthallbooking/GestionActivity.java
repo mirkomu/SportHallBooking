@@ -72,7 +72,7 @@ public class GestionActivity extends AppCompatActivity {
                 iv3.setBottom(1);
 
                 //ajout image supression
-                iv3.setImageResource(R.drawable.img_poubelle_opt_mini);
+                iv3.setImageResource(R.drawable.img_poubelle_opt_tab);
                 //ceci suprimme tout mes reservation (curent user)
                 //   String strChosenDate = day + "-" + MonthCorrected + "-" + year;
                 //   Firebase.delete(strChosenDate, intent.getStringExtra(EXTRA_MESSAGE), mApp, getApplicationContext() );
@@ -94,6 +94,11 @@ public class GestionActivity extends AppCompatActivity {
 
             tv2.setGravity(Gravity.CENTER);
             tv2.setLayoutParams(new TableRow.LayoutParams(0, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1));
+
+            //mise en page utilisation de (getAutoSizeMaxTextSize()) pas possible avec api < 26
+            tv1.setTextSize(27);
+            tv2.setTextSize(27);
+            //tv1.getAutoSizeMaxTextSize();
 
             // ajout des cellules à la ligne
             row.addView(tv1);

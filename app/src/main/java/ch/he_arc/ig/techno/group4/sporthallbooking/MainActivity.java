@@ -209,8 +209,6 @@ public class MainActivity extends AppCompatActivity {
                             cal.getSelectedDate().getYear();
 
                     Firebase.add(strChosenDate, namePerson, mApp, getApplicationContext());
-
-   
                 }
             }
         });

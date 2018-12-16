@@ -208,31 +208,9 @@ public class MainActivity extends AppCompatActivity {
                     String strChosenDate = cal.getSelectedDate().getDay() + "-" + correctedMonth + "-" +
                             cal.getSelectedDate().getYear();
 
-                    Firebase.save(strChosenDate, namePerson, mApp);
+                    Firebase.add(strChosenDate, namePerson, mApp, getApplicationContext());
 
-     /*               FirebaseDatabase database = FirebaseDatabase.getInstance();
-                    try {
-                        DatabaseReference myRef;
-                        myRef = database.getReference(strChosenDate);
-                        String alreadyExistsName = "";
-                        for (Map.Entry<CalendarDay, String> dateBooked : mApp.bookedDays.entrySet()) {
-                            int MonthCorrected = (dateBooked.getKey().getMonth() + 1);
-                            String strDateBooked = dateBooked.getKey().getDay() + "-" + MonthCorrected + "-" + dateBooked.getKey().getYear();
-                            if (strChosenDate.equals(strDateBooked)) {
-                                alreadyExistsName = dateBooked.getValue();
-                                break;
-                            }
-                        }
-                        if (alreadyExistsName.equals("")) {
-                            myRef.setValue(namePerson);
-                            diplayToast("Réservation pour " + namePerson + " le " + strChosenDate + " effectuée");
-                        } else {
-                            diplayToast("Erreur, il y a déjà une réservation pour " + alreadyExistsName + " le " + strChosenDate + ". Date non réservée.");
-                        }
-                    } catch (NumberFormatException e) {
-                        diplayToast("Désolé, une erreur de date est survenue.");
-                    }
-                    */
+   
                 }
             }
         });

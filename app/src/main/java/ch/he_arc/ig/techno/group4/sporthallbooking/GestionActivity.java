@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -43,14 +44,14 @@ public class GestionActivity extends AppCompatActivity {
 
     TableLayout table = (TableLayout) findViewById(R.id.idTable); // on prend le tableau défini dans le layout
     TableRow row; // création d'un élément : ligne
-        TextView tv1, tv2, tv3; // création des cellules
-
+        TextView tv1, tv2; // création des cellules
+        ImageView iv3;
 
         // pour chaque ligne
         for (Map.Entry<CalendarDay, String> dateBooked : mApp.bookedDays.entrySet()) {
             row = new TableRow(this); // création d'une nouvelle ligne
             tv1 = new TextView(this); // création cellule => date reservation
-            //traitement du format des date (Firebase gère pas bien format de date)
+            //traitement du format des dates (Firebase gère pas bien format ce format)
             final int year = (dateBooked.getKey().getYear());
             final int MonthCorrected = (dateBooked.getKey().getMonth() + 1);//on ajoute + 1 pour commencé le mois a 1 et pas a 0
             final int day = (dateBooked.getKey().getDay());
@@ -65,16 +66,17 @@ public class GestionActivity extends AppCompatActivity {
             tv2.setText(dateBooked.getValue());
 
             // idem 3ème cellule => lien pour supprimer
-            tv3 = new TextView(this);
-            if (dateBooked.getValue().equals(intent.getStringExtra(EXTRA_MESSAGE))) {
-                tv3.setBottom(1);
-                tv3.setText("supprime moi ");
-                //TODO ajouter code pour suprimer entrée sur Firebase
+            iv3 = new ImageView(this);
 
+            if (dateBooked.getValue().equals(intent.getStringExtra(EXTRA_MESSAGE))) {
+                iv3.setBottom(1);
+
+                //ajout image supression
+                iv3.setImageResource(R.drawable.img_poubelle_opt_mini);
                 //ceci suprimme tout mes reservation (curent user)
                 //   String strChosenDate = day + "-" + MonthCorrected + "-" + year;
                 //   Firebase.delete(strChosenDate, intent.getStringExtra(EXTRA_MESSAGE), mApp, getApplicationContext() );
-                //    final int id = i;
+
                 final TextView dateCol = tv1;
                 row.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -87,7 +89,7 @@ public class GestionActivity extends AppCompatActivity {
                 });
 
             } else {
-                tv3.setText("-");
+                //on affiche pas d'image et la ligne est pas cliquable
             }
 
             tv2.setGravity(Gravity.CENTER);
@@ -96,7 +98,7 @@ public class GestionActivity extends AppCompatActivity {
             // ajout des cellules à la ligne
             row.addView(tv1);
             row.addView(tv2);
-            row.addView(tv3);
+            row.addView(iv3);
 
             // ajout de la ligne au tableau
             table.addView(row);

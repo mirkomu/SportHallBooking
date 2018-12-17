@@ -95,8 +95,9 @@ public class GestionActivity extends AppCompatActivity {
             tv2.setLayoutParams(new TableRow.LayoutParams(0, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1));
 
             //mise en page utilisation de (getAutoSizeMaxTextSize()) pas possible avec api < 26
-            //    tv1.setTextSize(27);
-            //    tv2.setTextSize(27);
+            //si des
+                tv1.setTextSize(20);
+                tv2.setTextSize(20);
             //tv1.getAutoSizeMaxTextSize();
 
             // ajout des cellules à la ligne

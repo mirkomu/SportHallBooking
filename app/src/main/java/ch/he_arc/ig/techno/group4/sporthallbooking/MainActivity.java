@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, GestionActivity.class);
                 String message = MyApplication.userName;
-                //     intent.putExtra(EXTRA_MESSAGE, message); //cette ligne est essanciel même si on utilise directement les objets de la classe
+           //     intent.putExtra(EXTRA_MESSAGE, message); //cette ligne est essanciel même si on utilise directement les objets de la classe
                 Intent i = new Intent(MainActivity.this, GestionActivity.class);
                 // intent.putExtra("KEY", MyApplication.bookedDays); startActivity(intent);
 

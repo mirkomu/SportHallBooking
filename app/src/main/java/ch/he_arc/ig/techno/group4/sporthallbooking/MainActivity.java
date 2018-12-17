@@ -12,6 +12,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -125,8 +126,8 @@ public class MainActivity extends AppCompatActivity {
                         mDrawerLayout.closeDrawers();
 
                         // Add code here to update the UI based on the item selected
-                        //Intent intent = new Intent(MainActivity.this.getContext, GestionActivity.class);
-                        //this.startActivity(intent);
+                        Intent intent = new Intent(getApplicationContext(), GestionActivity.class);
+                        startActivity(intent);
                         // For example, swap UI fragments here
 
                         return true;

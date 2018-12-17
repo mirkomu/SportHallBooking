@@ -14,6 +14,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TableLayout;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -265,7 +266,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, GestionActivity.class);
                 String message = MyApplication.userName;
-                intent.putExtra(EXTRA_MESSAGE, message); //cette ligne est essanciel même si on utilise directement les objets de la classe MyApplication
+           //     intent.putExtra(EXTRA_MESSAGE, message); //cette ligne est essanciel même si on utilise directement les objets de la classe
+                Intent i = new Intent(MainActivity.this, GestionActivity.class);
                 // intent.putExtra("KEY", MyApplication.bookedDays); startActivity(intent);
 
                 startActivity(intent);

@@ -1,13 +1,10 @@
 package ch.he_arc.ig.techno.group4.sporthallbooking;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -19,8 +16,6 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import java.util.Map;
 
 import ch.he_arc.ig.techno.group4.sporthallbooking.firebase.Firebase;
-
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 public class GestionActivity extends AppCompatActivity {
 
@@ -39,10 +34,10 @@ public class GestionActivity extends AppCompatActivity {
 
         //contiens les données de l'application
         final MyApplication mApp = new MyApplication();
-        final Intent intent = getIntent();
+        //   final Intent intent = getIntent();
 
 
-    TableLayout table = (TableLayout) findViewById(R.id.idTable); // on prend le tableau défini dans le layout
+        final TableLayout table = (TableLayout) findViewById(R.id.idTable); // on prend le tableau défini dans le layout
     TableRow row; // création d'un élément : ligne
         TextView tv1, tv2; // création des cellules
         ImageView iv3;
@@ -68,11 +63,11 @@ public class GestionActivity extends AppCompatActivity {
             // idem 3ème cellule => lien pour supprimer
             iv3 = new ImageView(this);
 
-            if (dateBooked.getValue().equals(intent.getStringExtra(EXTRA_MESSAGE))) {
+            if (dateBooked.getValue().equals(mApp.userName)) {
                 iv3.setBottom(1);
 
                 //ajout image supression
-                iv3.setImageResource(R.drawable.img_poubelle_opt_tab);
+                iv3.setImageResource(R.drawable.img_poubelle_opt);
                 //ceci suprimme tout mes reservation (curent user)
                 //   String strChosenDate = day + "-" + MonthCorrected + "-" + year;
                 //   Firebase.delete(strChosenDate, intent.getStringExtra(EXTRA_MESSAGE), mApp, getApplicationContext() );
@@ -83,8 +78,12 @@ public class GestionActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         // faites ici ce que vous voulez
                         String strChosenDate = day + "-" + MonthCorrected + "-" + year;
-                        Firebase.delete(strChosenDate, intent.getStringExtra(EXTRA_MESSAGE), mApp, getApplicationContext());
+                        Firebase.delete(strChosenDate, mApp.userName.toString(), mApp, getApplicationContext());
                         //Toast.makeText(getApplicationContext(), String.valueOf(dateCol.getText()), Toast.LENGTH_SHORT).show();
+                        //    table.removeAllViews();
+                        //revoie sur l'activitée prioncipal
+                        startActivity(new Intent(GestionActivity.this, MainActivity.class));
+
                     }
                 });
 
@@ -96,8 +95,9 @@ public class GestionActivity extends AppCompatActivity {
             tv2.setLayoutParams(new TableRow.LayoutParams(0, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1));
 
             //mise en page utilisation de (getAutoSizeMaxTextSize()) pas possible avec api < 26
-            tv1.setTextSize(27);
-            tv2.setTextSize(27);
+            //si des
+                tv1.setTextSize(20);
+                tv2.setTextSize(20);
             //tv1.getAutoSizeMaxTextSize();
 
             // ajout des cellules à la ligne

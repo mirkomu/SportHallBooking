@@ -1,6 +1,7 @@
 package ch.he_arc.ig.techno.group4.sporthallbooking;
 
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
@@ -30,7 +31,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import ch.he_arc.ig.techno.group4.sporthallbooking.firebase.Firebase;
 import ch.he_arc.ig.techno.group4.sporthallbooking.persistance.DBOpenHelper;
+
+import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     // Variables et éléments UI utilisés dans cette activité
     MaterialCalendarView agenda;
     Button button;
+    Button buttonGestionReservation;
     DatabaseReference db;
     ValueEventListener postListener;
     // The database
@@ -107,13 +112,15 @@ public class MainActivity extends AppCompatActivity {
         db = FirebaseDatabase.getInstance().getReference();
         mApp.bookedDays = new HashMap<>();
 
+        buttonGestionReservation = findViewById(R.id.btnGestReservation);
+
         //Initalisation de la base de donnée local (SQLITE)
         dbLocalOpenHelper = new DBOpenHelper(this, DBOpenHelper.Constants.DATABASE_NAME, null,
                 DBOpenHelper.Constants.DATABASE_VERSION);
         // open the database
         openLocalDB();
 
-        final EditText nameEdit = findViewById(R.id.editTextName);
+        final EditText nameEdit = findViewById(R.id.editTextNameActivity2);
 
         //recherche des données dans la base local si un nom est trouvé on l'insert dans le champs nom de l'aplication
 
@@ -178,9 +185,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if(nameEdit.getText().length() == 0) {
                     diplayToast("Veuillez indiquer votre nom.");
-                } else if (cal.getSelectedDate().getDate().compareTo(new Date()) < 0)
-
-                {
+                } else if (cal.getSelectedDate().getDate().compareTo(new Date()) < 0) {
                     diplayToast("La date doit être dans le futur.");
                 } else {
                     String namePerson = nameEdit.getText().toString();
@@ -202,28 +207,8 @@ public class MainActivity extends AppCompatActivity {
                     int correctedMonth = cal.getSelectedDate().getMonth() + 1;
                     String strChosenDate = cal.getSelectedDate().getDay() + "-" + correctedMonth + "-" +
                             cal.getSelectedDate().getYear();
-                    FirebaseDatabase database = FirebaseDatabase.getInstance();
-                    try {
-                        DatabaseReference myRef;
-                        myRef = database.getReference(strChosenDate);
-                        String alreadyExistsName = "";
-                        for (Map.Entry<CalendarDay, String> dateBooked : mApp.bookedDays.entrySet()) {
-                            int MonthCorrected = (dateBooked.getKey().getMonth() + 1);
-                            String strDateBooked = dateBooked.getKey().getDay() + "-" + MonthCorrected + "-" + dateBooked.getKey().getYear();
-                            if (strChosenDate.equals(strDateBooked)) {
-                                alreadyExistsName = dateBooked.getValue();
-                                break;
-                            }
-                        }
-                        if (alreadyExistsName.equals("")) {
-                            myRef.setValue(namePerson);
-                            diplayToast("Réservation pour " + namePerson + " le " + strChosenDate + " effectuée");
-                        } else {
-                            diplayToast("Erreur, il y a déjà une réservation pour " + alreadyExistsName + " le " + strChosenDate + ". Date non réservée.");
-                        }
-                    } catch (NumberFormatException e) {
-                        diplayToast("Désolé, une erreur de date est survenue.");
-                    }
+
+                    Firebase.add(strChosenDate, namePerson, mApp, getApplicationContext());
                 }
             }
         });
@@ -268,6 +253,22 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     }
                 }
+            }
+        });
+
+
+        //button gestionReservation (GestionActivity
+
+        // Evénement : Quand le bouton gèrer les réservations est cliqué; ouvre l'activity "GestionActivity
+        buttonGestionReservation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, GestionActivity.class);
+                String message = MyApplication.userName;
+                intent.putExtra(EXTRA_MESSAGE, message); //cette ligne est essanciel même si on utilise directement les objets de la classe MyApplication
+                // intent.putExtra("KEY", MyApplication.bookedDays); startActivity(intent);
+
+                startActivity(intent);
             }
         });
     }

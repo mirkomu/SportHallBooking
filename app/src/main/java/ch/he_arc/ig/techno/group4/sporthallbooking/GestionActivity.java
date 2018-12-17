@@ -39,10 +39,10 @@ public class GestionActivity extends AppCompatActivity {
 
         //contiens les données de l'application
         final MyApplication mApp = new MyApplication();
-        final Intent intent = getIntent();
+        //   final Intent intent = getIntent();
 
 
-    TableLayout table = (TableLayout) findViewById(R.id.idTable); // on prend le tableau défini dans le layout
+        final TableLayout table = (TableLayout) findViewById(R.id.idTable); // on prend le tableau défini dans le layout
     TableRow row; // création d'un élément : ligne
         TextView tv1, tv2; // création des cellules
         ImageView iv3;
@@ -68,7 +68,8 @@ public class GestionActivity extends AppCompatActivity {
             // idem 3ème cellule => lien pour supprimer
             iv3 = new ImageView(this);
 
-            if (dateBooked.getValue().equals(intent.getStringExtra(EXTRA_MESSAGE))) {
+            if (dateBooked.getValue().equals(mApp.userName)) {
+
                 iv3.setBottom(1);
 
                 //ajout image supression
@@ -83,8 +84,12 @@ public class GestionActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         // faites ici ce que vous voulez
                         String strChosenDate = day + "-" + MonthCorrected + "-" + year;
-                        Firebase.delete(strChosenDate, intent.getStringExtra(EXTRA_MESSAGE), mApp, getApplicationContext());
+                        Firebase.delete(strChosenDate, mApp.userName.toString(), mApp, getApplicationContext());
                         //Toast.makeText(getApplicationContext(), String.valueOf(dateCol.getText()), Toast.LENGTH_SHORT).show();
+                        //    table.removeAllViews();
+                        //revoie sur l'activitée prioncipal
+                        startActivity(new Intent(GestionActivity.this, MainActivity.class));
+
                     }
                 });
 

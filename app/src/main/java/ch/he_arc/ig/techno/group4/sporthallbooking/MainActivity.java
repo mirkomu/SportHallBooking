@@ -1,6 +1,7 @@
 package ch.he_arc.ig.techno.group4.sporthallbooking;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -9,12 +10,15 @@ import android.database.sqlite.SQLiteStatement;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import android.support.design.widget.NavigationView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -50,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     private SQLiteDatabase dbLocal;
     // The database creator and updater helper
     DBOpenHelper dbLocalOpenHelper;
+    private DrawerLayout mDrawerLayout;
 
 
     /*********************************************************************************/
@@ -106,13 +111,35 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mDrawerLayout = findViewById(R.id.drawer_layout);
         agenda = findViewById(R.id.calendarView);
         agenda.setDateSelected(new Date(), true);
         button = findViewById(R.id.btnReserve);
         db = FirebaseDatabase.getInstance().getReference();
         mApp.bookedDays = new HashMap<>();
 
-        buttonGestionReservation = findViewById(R.id.btnGestReservation);
+        //Menu de navigation
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(
+            new NavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(MenuItem menuItem) {
+                    // set item as selected to persist highlight
+                    menuItem.setChecked(true);
+
+                    // close drawer when item is tapped
+                    mDrawerLayout.closeDrawers();
+
+                    Intent intent = new Intent(MainActivity.this, GestionActivity.class);
+                    String message = MyApplication.userName;
+                    intent.putExtra(EXTRA_MESSAGE, message); //cette ligne est essanciel même si on utilise directement les objets de la classe MyApplication
+                    // intent.putExtra("KEY", MyApplication.bookedDays); startActivity(intent);
+
+                    startActivity(intent);
+
+                    return true;
+                }
+            });
 
         //Initalisation de la base de donnée local (SQLITE)
         dbLocalOpenHelper = new DBOpenHelper(this, DBOpenHelper.Constants.DATABASE_NAME, null,
@@ -256,21 +283,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        //button gestionReservation (GestionActivity
-
-        // Evénement : Quand le bouton gèrer les réservations est cliqué; ouvre l'activity "GestionActivity
-        buttonGestionReservation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, GestionActivity.class);
-                String message = MyApplication.userName;
-                intent.putExtra(EXTRA_MESSAGE, message); //cette ligne est essanciel même si on utilise directement les objets de la classe MyApplication
-                // intent.putExtra("KEY", MyApplication.bookedDays); startActivity(intent);
-
-                startActivity(intent);
-            }
-        });
     }
 
 

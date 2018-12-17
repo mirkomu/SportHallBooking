@@ -1,13 +1,10 @@
 package ch.he_arc.ig.techno.group4.sporthallbooking;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -19,8 +16,6 @@ import com.prolificinteractive.materialcalendarview.CalendarDay;
 import java.util.Map;
 
 import ch.he_arc.ig.techno.group4.sporthallbooking.firebase.Firebase;
-
-import static android.provider.AlarmClock.EXTRA_MESSAGE;
 
 public class GestionActivity extends AppCompatActivity {
 
@@ -69,11 +64,10 @@ public class GestionActivity extends AppCompatActivity {
             iv3 = new ImageView(this);
 
             if (dateBooked.getValue().equals(mApp.userName)) {
-
                 iv3.setBottom(1);
 
                 //ajout image supression
-                iv3.setImageResource(R.drawable.img_poubelle_opt_tab);
+                iv3.setImageResource(R.drawable.img_poubelle_opt);
                 //ceci suprimme tout mes reservation (curent user)
                 //   String strChosenDate = day + "-" + MonthCorrected + "-" + year;
                 //   Firebase.delete(strChosenDate, intent.getStringExtra(EXTRA_MESSAGE), mApp, getApplicationContext() );
@@ -101,8 +95,8 @@ public class GestionActivity extends AppCompatActivity {
             tv2.setLayoutParams(new TableRow.LayoutParams(0, android.view.ViewGroup.LayoutParams.WRAP_CONTENT, 1));
 
             //mise en page utilisation de (getAutoSizeMaxTextSize()) pas possible avec api < 26
-            tv1.setTextSize(27);
-            tv2.setTextSize(27);
+            //    tv1.setTextSize(27);
+            //    tv2.setTextSize(27);
             //tv1.getAutoSizeMaxTextSize();
 
             // ajout des cellules à la ligne

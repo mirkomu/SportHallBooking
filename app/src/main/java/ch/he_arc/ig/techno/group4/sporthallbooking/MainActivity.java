@@ -250,7 +250,9 @@ public class MainActivity extends AppCompatActivity {
                     //int MonthCorrected = (dateBooked.getKey().getMonth() + 1);
                     //String strDateBooked = dateBooked.getKey().getDay() + "-" + MonthCorrected + "-" + dateBooked.getKey().getYear();
                     if (date.getDate().compareTo(dateBooked.getKey().getDate()) == 0) {
-                        diplayToast(dateBooked.getValue() + " a déjà réservé le " + dateBooked.getKey().getDate().toString());
+                        int MonthCorrected = (dateBooked.getKey().getMonth() + 1);
+                        String strDateBooked = dateBooked.getKey().getDay() + "-" + MonthCorrected + "-" + dateBooked.getKey().getYear();
+                        diplayToast(dateBooked.getValue() + " a déjà réservé le " + strDateBooked);
                         break;
                     }
                 }

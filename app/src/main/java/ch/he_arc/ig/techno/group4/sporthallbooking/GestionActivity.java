@@ -3,12 +3,14 @@ package ch.he_arc.ig.techno.group4.sporthallbooking;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.prolificinteractive.materialcalendarview.CalendarDay;
@@ -36,6 +38,13 @@ public class GestionActivity extends AppCompatActivity {
         final MyApplication mApp = new MyApplication();
         //   final Intent intent = getIntent();
 
+        Button buttonRetour = findViewById(R.id.btnReturn);
+        buttonRetour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(GestionActivity.this, MainActivity.class));
+            }
+        });
 
         final TableLayout table = (TableLayout) findViewById(R.id.idTable); // on prend le tableau défini dans le layout
     TableRow row; // création d'un élément : ligne
@@ -64,8 +73,6 @@ public class GestionActivity extends AppCompatActivity {
             iv3 = new ImageView(this);
 
             if (dateBooked.getValue().equals(mApp.userName)) {
-                iv3.setBottom(1);
-
                 //ajout image supression
                 iv3.setImageResource(R.drawable.img_poubelle_opt);
                 //ceci suprimme tout mes reservation (curent user)
